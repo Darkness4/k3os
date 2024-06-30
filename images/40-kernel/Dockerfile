@@ -28,6 +28,6 @@ RUN cd /usr/src/initrd && \
     cp /usr/src/k3os/k3os k3os/system/k3os/${TAG} && \
     ln -s ${TAG} k3os/system/k3os/current && \
     ln -s /k3os/system/k3os/current/k3os init
-    
+
 RUN cd /usr/src/initrd && \
     find . | cpio -H newc -o | gzip -c -1 > /output/initrd

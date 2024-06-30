@@ -1,24 +1,24 @@
 ARG REPO
 ARG TAG
-FROM ubuntu:focal
+FROM ubuntu:noble
 
 RUN apt-get --assume-yes update \
- && apt-get --assume-yes install \
+    && apt-get --assume-yes install \
     curl \
     initramfs-tools \
     kmod \
     lz4 \
     rsync \
     xz-utils \
- && echo 'r8152' >> /etc/initramfs-tools/modules \
- && echo 'hfs' >> /etc/initramfs-tools/modules \
- && echo 'hfsplus' >> /etc/initramfs-tools/modules \
- && echo 'nls_utf8' >> /etc/initramfs-tools/modules \
- && echo 'nls_iso8859_1' >> /etc/initramfs-tools/modules
+    && echo 'r8152' >> /etc/initramfs-tools/modules \
+    && echo 'hfs' >> /etc/initramfs-tools/modules \
+    && echo 'hfsplus' >> /etc/initramfs-tools/modules \
+    && echo 'nls_utf8' >> /etc/initramfs-tools/modules \
+    && echo 'nls_iso8859_1' >> /etc/initramfs-tools/modules
 
 ARG ARCH
-ENV KVERSION=5.4.0-132-generic
-ENV URL=https://github.com/themgt/k3os-kernel/releases/download/5.4.0-132.148-rancher1
+ENV KVERSION=6.8.0-38-generic
+ENV URL=https://github.com/Darkness4/k3os-kernel/releases/download/6.8.0-38.38-generic
 ENV KERNEL_XZ=${URL}/kernel-generic_${ARCH}.tar.xz
 ENV KERNEL_EXTRA_XZ=${URL}/kernel-extra-generic_${ARCH}.tar.xz
 ENV KERNEL_HEADERS_XZ=${URL}/kernel-headers-generic_${ARCH}.tar.xz
@@ -47,10 +47,9 @@ RUN mkdir -p /output/lib && \
     mkdir -p /output/headers && \
     cd /usr/src/initrd && \
     lz4cat /usr/src/initrd.tmp | cpio -idmv && \
-    find lib/modules -name \*.ko > /output/initrd-modules && \
+    find usr/lib/modules -name \*.ko.zst | sed 's!usr/!!' > /output/initrd-modules && \
     echo lib/modules/${KVERSION}/modules.order >> /output/initrd-modules && \
     echo lib/modules/${KVERSION}/modules.builtin >> /output/initrd-modules && \
-    find lib/firmware -type f > /output/initrd-firmware && \
     find usr/lib/firmware -type f | sed 's!usr/!!' >> /output/initrd-firmware
 
 # Copy output assets

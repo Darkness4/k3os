@@ -7,54 +7,54 @@ platform:
   arch: amd64
 
 steps:
-- name: build
-  image: rancher/dapper:v0.5.0
-  commands:
-  - dapper ci
-  volumes:
-  - name: docker
-    path: /var/run/docker.sock
+  - name: build
+    image: rancher/dapper:v0.5.0
+    commands:
+      - dapper ci
+    volumes:
+      - name: docker
+        path: /var/run/docker.sock
 
-- name: github_binary_release
-  image: ibuildthecloud/github-release:v0.0.1
-  settings:
-    api_key:
-      from_secret: github_token
-    prerelease: true
-    checksum:
-    - sha256
-    checksum_file: CHECKSUMsum-amd64.txt
-    checksum_flatten: true
-    files:
-    - "dist/artifacts/*"
-  when:
-    ref:
-    - refs/head/master
-    - refs/tags/*
-    event:
-    - tag
+  - name: github_binary_release
+    image: ibuildthecloud/github-release:v0.0.1
+    settings:
+      api_key:
+        from_secret: github_token
+      prerelease: true
+      checksum:
+        - sha256
+      checksum_file: CHECKSUMsum-amd64.txt
+      checksum_flatten: true
+      files:
+        - 'dist/artifacts/*'
+    when:
+      ref:
+        - refs/head/master
+        - refs/tags/*
+      event:
+        - tag
 
-- name: docker-publish
-  image: plugins/docker
-  settings:
-    dockerfile: package/Dockerfile
-    password:
-      from_secret: docker_password
-    repo: "themgt/k3os"
-    tag: "${DRONE_TAG}-amd64"
-    username:
-      from_secret: docker_username
-  when:
-    ref:
-    - refs/head/master
-    - refs/tags/*
-    event:
-    - tag
+  - name: docker-publish
+    image: plugins/docker
+    settings:
+      dockerfile: package/Dockerfile
+      password:
+        from_secret: docker_password
+      repo: 'ghcr.io/darkness4/k3os'
+      tag: '${DRONE_TAG}-amd64'
+      username:
+        from_secret: docker_username
+    when:
+      ref:
+        - refs/head/master
+        - refs/tags/*
+      event:
+        - tag
 
 volumes:
-- name: docker
-  host:
-    path: /var/run/docker.sock
+  - name: docker
+    host:
+      path: /var/run/docker.sock
 
 ---
 kind: pipeline
@@ -65,54 +65,54 @@ platform:
   arch: arm64
 
 steps:
-- name: build
-  image: rancher/dapper:v0.5.0
-  commands:
-  - dapper ci
-  volumes:
-  - name: docker
-    path: /var/run/docker.sock
+  - name: build
+    image: rancher/dapper:v0.5.0
+    commands:
+      - dapper ci
+    volumes:
+      - name: docker
+        path: /var/run/docker.sock
 
-- name: github_binary_release
-  image: ibuildthecloud/github-release:v0.0.1
-  settings:
-    api_key:
-      from_secret: github_token
-    prerelease: true
-    checksum:
-    - sha256
-    checksum_file: CHECKSUMsum-arm64.txt
-    checksum_flatten: true
-    files:
-    - "dist/artifacts/*"
-  when:
-    ref:
-    - refs/head/master
-    - refs/tags/*
-    event:
-    - tag
+  - name: github_binary_release
+    image: ibuildthecloud/github-release:v0.0.1
+    settings:
+      api_key:
+        from_secret: github_token
+      prerelease: true
+      checksum:
+        - sha256
+      checksum_file: CHECKSUMsum-arm64.txt
+      checksum_flatten: true
+      files:
+        - 'dist/artifacts/*'
+    when:
+      ref:
+        - refs/head/master
+        - refs/tags/*
+      event:
+        - tag
 
-- name: docker-publish
-  image: plugins/docker
-  settings:
-    dockerfile: package/Dockerfile
-    password:
-      from_secret: docker_password
-    repo: "themgt/k3os"
-    tag: "${DRONE_TAG}-arm64"
-    username:
-      from_secret: docker_username
-  when:
-    ref:
-    - refs/head/master
-    - refs/tags/*
-    event:
-    - tag
+  - name: docker-publish
+    image: plugins/docker
+    settings:
+      dockerfile: package/Dockerfile
+      password:
+        from_secret: docker_password
+      repo: 'ghcr.io/darkness4/k3os'
+      tag: '${DRONE_TAG}-arm64'
+      username:
+        from_secret: docker_username
+    when:
+      ref:
+        - refs/head/master
+        - refs/tags/*
+      event:
+        - tag
 
 volumes:
-- name: docker
-  host:
-    path: /var/run/docker.sock
+  - name: docker
+    host:
+      path: /var/run/docker.sock
 
 ---
 kind: pipeline
@@ -123,26 +123,26 @@ platform:
   arch: amd64
 
 steps:
-- name: manifest
-  image: plugins/manifest:1.0.2
-  settings:
-    username:
-      from_secret: docker_username
-    password:
-      from_secret: docker_password
-    platforms:
-      - linux/amd64
-      - linux/arm64
-      - linux/arm
-    target: "themgt/k3os:${DRONE_TAG}"
-    template: "themgt/k3os:${DRONE_TAG}-ARCH"
-  when:
-    ref:
-    - refs/head/master
-    - refs/tags/*
-    event:
-    - tag
+  - name: manifest
+    image: plugins/manifest:1.0.2
+    settings:
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+      platforms:
+        - linux/amd64
+        - linux/arm64
+        - linux/arm
+      target: 'ghcr.io/darkness4/k3os:${DRONE_TAG}'
+      template: 'ghcr.io/darkness4/k3os:${DRONE_TAG}-ARCH'
+    when:
+      ref:
+        - refs/head/master
+        - refs/tags/*
+      event:
+        - tag
 
 depends_on:
-- amd64
-- arm64
+  - amd64
+  - arm64
