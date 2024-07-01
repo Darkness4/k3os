@@ -1,0 +1,12 @@
+FROM golang:1.16-alpine3.14
+
+ENV ARCH $TARGETARCH
+
+RUN apk -U add bash git gcc musl-dev docker vim less file curl wget ca-certificates
+RUN if [ "$(go env GOARCH)" = "arm64" ]; then \
+    curl -sL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s v1.38.0; \
+    fi
+
+ENV HOME /work
+WORKDIR /work
+CMD ["./scripts/entry", "ci"]

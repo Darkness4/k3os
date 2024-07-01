@@ -1,8 +1,7 @@
 #!/bin/bash
 set -e
 
-build_all()
-{
+build_all() {
     if [ "$#" = 0 ]; then
         set -- [0-9][0-9]*
     fi
@@ -24,13 +23,12 @@ build_all()
         if [ -e root ]; then
             ROOT=$(readlink -f root)
         fi
-        docker build --build-arg TAG=$TAG --build-arg VERSION=${VERSION} --build-arg REPO=${REPO} --build-arg ARCH=${ARCH} -f $(pwd)/Dockerfile -t $FULL_IMAGE $ROOT
+        docker build --platform=${BUILDPLATFORM} --build-arg TAG=$TAG --build-arg VERSION=${VERSION} --build-arg REPO=${REPO} --build-arg ARCH=${ARCH} -f $(pwd)/Dockerfile -t $FULL_IMAGE $ROOT
         cd ..
     done
 }
 
-copy_all()
-{
+copy_all() {
     OUTPUT=$1
     shift
 
