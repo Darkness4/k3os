@@ -27,7 +27,7 @@ func PromptPassword() (string, bool, error) {
 	if err != nil {
 		return "", false, errors.Wrapf(err, "failed to confirm password")
 	}
-	return string(c), bytes.Compare(p, c) == 0, nil
+	return string(c), bytes.Equal(p, c), nil
 }
 
 func MaskPassword(r *os.File, w io.Writer) ([]byte, error) {

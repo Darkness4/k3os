@@ -34,10 +34,10 @@ func syncHostname() error {
 	}
 
 	hosts, err := os.Open("/etc/hosts")
-	defer hosts.Close()
 	if err != nil {
 		return err
 	}
+	defer hosts.Close()
 	lines := bufio.NewScanner(hosts)
 	content := ""
 	for lines.Scan() {
