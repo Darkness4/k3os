@@ -2,11 +2,10 @@ package system
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"github.com/docker/docker/pkg/mount"
+	"github.com/moby/sys/mount"
 	"github.com/otiai10/copy"
 	"github.com/sirupsen/logrus"
 )
@@ -73,7 +72,7 @@ func CopyComponent(src, dst string, remount bool, key string) (bool, error) {
 	logrus.Debugf("created symlink: %v", dstCurrTemp)
 	defer os.Remove(dstCurrTemp) // if this fails, that means it's gone which is correct
 
-	dstTemp, err := ioutil.TempDir(filepath.Split(dstPath))
+	dstTemp, err := os.MkdirTemp(filepath.Split(dstPath))
 	if err != nil {
 		return false, err
 	}

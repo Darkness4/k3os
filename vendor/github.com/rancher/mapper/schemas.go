@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/rancher/mapper/convert"
-	"github.com/rancher/wrangler/pkg/name"
+	"github.com/rancher/wrangler/v3/pkg/name"
 )
 
 type SchemaCollection struct {

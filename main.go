@@ -7,8 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/docker/docker/pkg/mount"
 	"github.com/docker/docker/pkg/reexec"
+	"github.com/moby/sys/mount"
 	"github.com/rancher/k3os/pkg/cli/app"
 	"github.com/rancher/k3os/pkg/enterchroot"
 	"github.com/rancher/k3os/pkg/transferroot"

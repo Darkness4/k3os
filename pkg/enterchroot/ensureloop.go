@@ -2,11 +2,10 @@ package enterchroot
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 
-	"github.com/docker/docker/pkg/mount"
+	"github.com/moby/sys/mount"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
@@ -25,7 +24,7 @@ func mountProc() error {
 }
 
 func mountDev() error {
-	if files, err := ioutil.ReadDir("/dev"); err == nil && len(files) > 2 {
+	if files, err := os.ReadDir("/dev"); err == nil && len(files) > 2 {
 		return nil
 	}
 	logrus.Debug("mkdir /dev")

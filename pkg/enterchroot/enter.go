@@ -3,7 +3,6 @@ package enterchroot
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -12,8 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/docker/docker/pkg/mount"
 	"github.com/docker/docker/pkg/reexec"
+	"github.com/moby/sys/mount"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
@@ -65,7 +64,7 @@ func isDebug() bool {
 		return false
 	}
 
-	bytes, err := ioutil.ReadFile("/proc/cmdline")
+	bytes, err := os.ReadFile("/proc/cmdline")
 	if err != nil {
 		// ignore error
 		return false
@@ -307,7 +306,7 @@ func checkSquashfs() error {
 }
 
 func inProcFS() bool {
-	bytes, err := ioutil.ReadFile("/proc/filesystems")
+	bytes, err := os.ReadFile("/proc/filesystems")
 	if err != nil {
 		logrus.Errorf("Failed to read /proc/filesystems: %v", err)
 		return false
