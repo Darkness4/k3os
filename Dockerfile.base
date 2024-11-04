@@ -1,4 +1,4 @@
-FROM golang:1.16-alpine3.14
+FROM golang:1.23.2-alpine3.20
 
 ENV ARCH $TARGETARCH
 
