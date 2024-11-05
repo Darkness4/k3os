@@ -19,7 +19,7 @@ ID=$(docker create --platform=${BUILDPLATFORM} ${REPO}/k3os-package:${TAG})
 docker cp ${ID}:/output/k3os ./build/
 docker rm -fv $ID
 
-docker build \
+DOCKER_BUILDKIT=0 docker build \
   --build-arg ARCH=${ARCH} \
   --build-arg REPO=${REPO} \
   --build-arg TAG=${TAG} \
