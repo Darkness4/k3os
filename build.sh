@@ -25,7 +25,7 @@ podman tag ghcr.io/darkness4/k3os:latest "ghcr.io/darkness4/k3os:${GIT_TAG}-amd6
 podman push "ghcr.io/darkness4/k3os:${GIT_TAG}-amd64"
 podman push "ghcr.io/darkness4/k3os:latest-amd64"
 # shellcheck disable=SC2046
-podman rmi -f $(podman images --filter=reference="ghcr.io/darkness4/k3os*:dev" -q)
+podman rmi -f $(podman images --filter=reference="ghcr.io/darkness4/k3os*:dev" -q) || true
 
 rm -rf ./build/
 
