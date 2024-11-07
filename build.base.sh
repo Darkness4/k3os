@@ -2,7 +2,7 @@
 
 set -ex
 
-sudo podman run --rm --privileged multiarch/qemu-user-static --reset -p yes
+sudo podman run --rm --privileged alekitto/qemu-user-static --reset -p yes
 
 podman manifest rm ghcr.io/darkness4/k3os:latest-base || true
 

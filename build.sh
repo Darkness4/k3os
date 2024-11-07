@@ -2,7 +2,7 @@
 
 set -ex
 
-sudo podman run --rm --privileged multiarch/qemu-user-static --reset -p yes
+sudo podman run --rm --privileged alekitto/qemu-user-static --reset -p yes
 
 # Remove unix:// from DOCKER_HOST
 DOCKER_HOST=$(echo ${DOCKER_HOST} | sed 's/^unix:\/\///')

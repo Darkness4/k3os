@@ -27,4 +27,4 @@ COPY --from=linuxkit /output/ /output/
 COPY --from=k3os /output/ /output/
 WORKDIR /output
 RUN git clone --branch v0.7.0 https://github.com/ahmetb/kubectx.git \
- && chmod -v +x kubectx/kubectx kubectx/kubens
+  && chmod -v +x kubectx/kubectx kubectx/kubens

@@ -4,7 +4,9 @@ FROM ubuntu:noble
 
 RUN apt-get --assume-yes update \
     && apt-get --assume-yes install \
+    --no-install-recommends \
     curl \
+    ca-certificates \
     initramfs-tools \
     kmod \
     lz4 \
