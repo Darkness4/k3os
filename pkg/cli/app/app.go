@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	Debug bool
+	Debug bool = true
 )
 
 // New CLI App

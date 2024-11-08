@@ -55,6 +55,10 @@ func CopyComponent(src, dst string, remount bool, key string) (bool, error) {
 		return false, nil
 	}
 	if remount {
+		logrus.WithFields(logrus.Fields{
+			"target": dst,
+			"flags":  "remount,rw",
+		}).Warn("remounting")
 		if err := mount.Mount("", dst, "none", "remount,rw"); err != nil {
 			return false, err
 		}
