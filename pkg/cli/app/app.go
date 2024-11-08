@@ -43,6 +43,7 @@ func New() *cli.App {
 	}
 
 	app.Before = func(c *cli.Context) error {
+		logrus.SetReportCaller(true)
 		if Debug {
 			logrus.SetLevel(logrus.DebugLevel)
 		}

@@ -2,7 +2,10 @@
 
 set -ex
 
-sudo podman run --rm --privileged alekitto/qemu-user-static --reset -p yes
+# Check if binfmt arm64 is enabled
+if [ ! -f /proc/sys/fs/binfmt_misc/qemu-aarch64 ]; then
+  sudo podman run --rm --privileged alekitto/qemu-user-static --reset -p yes
+fi
 
 # Remove unix:// from DOCKER_HOST
 DOCKER_HOST=$(echo ${DOCKER_HOST} | sed 's/^unix:\/\///')
@@ -47,6 +50,7 @@ podman push "ghcr.io/darkness4/k3os:${GIT_TAG}-arm64"
 podman push "ghcr.io/darkness4/k3os:latest-arm64"
 
 # Build the manifest
+podman manifest rm ghcr.io/darkness4/k3os:${GIT_TAG} || true
 podman manifest create ghcr.io/darkness4/k3os:${GIT_TAG} \
   ghcr.io/darkness4/k3os:${GIT_TAG}-amd64 \
   ghcr.io/darkness4/k3os:${GIT_TAG}-arm64
