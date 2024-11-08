@@ -4,6 +4,11 @@
 
 # k3OS
 
+> [!NOTE]
+>
+> This project is too cool to be deprecated! It is using proper standard linux procedures and is super lightweight.
+> I will maintain it until my Raspberry Pi dies!
+
 k3OS is a Linux distribution designed to remove as much OS maintenance
 as possible in a Kubernetes cluster. It is specifically designed to only
 have what is needed to run [k3s](https://github.com/rancher/k3s). Additionally
@@ -638,7 +643,7 @@ k3os:
   - "--service-cidr=10.107.1.0/23"
 
 # Effectively invokes k3s as:
-# exec "k3s" "server" "--cluster-cidr=10.107.0.0/23" "--service-cidr=10.107.1.0/23" 
+# exec "k3s" "server" "--cluster-cidr=10.107.0.0/23" "--service-cidr=10.107.1.0/23"
 ```
 
 ```yaml
@@ -652,7 +657,7 @@ k3os:
   - "10.107.1.0/23"
 
 # Effectively invokes k3s as:
-# exec "k3s" "server" "--cluster-cidr" "10.107.0.0/23" "--service-cidr" "10.107.1.0/23" 
+# exec "k3s" "server" "--cluster-cidr" "10.107.0.0/23" "--service-cidr" "10.107.1.0/23"
 ```
 
 ### `k3os.environment`
