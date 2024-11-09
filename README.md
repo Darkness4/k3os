@@ -26,7 +26,7 @@ from Kubernetes. Both k3OS and k3s upgrades are handled by the k3OS operator.
 
 ## Quick Start
 
-Download the ISO from the latest [release](https://github.com/rancher/k3os/releases) and run it
+Download the ISO from the latest [release](https://github.com/Darkness4/k3os/releases) and run it
 in VMware, VirtualBox, KVM, or bhyve. The server will automatically start a single node Kubernetes cluster.
 Log in with the user `rancher` and run `kubectl`. This is a "live install" running from the ISO media
 and changes will not persist after reboot.
@@ -175,17 +175,20 @@ and run with the `--takeover` flag. This will install k3OS to the current root a
 In order for this to work a couple of assumptions are made. First the root (/) is assumed to be an ext4 partition. Also it is assumed that grub2 is installed and looking for the configuration at `/boot/grub/grub.cfg`. When running `--takeover` ensure that you also set `--no-format` and DEVICE must be set to the partition of `/`. Refer to the AWS packer template to see this mode in action. Below is any example of how to run a takeover installation.
 
 ```bash
-./install.sh --takeover --debug --tty ttyS0 --config /tmp/config.yaml --no-format /dev/vda1 https://github.com/rancher/k3os/releases/download/v0.10.0/k3os.iso
+./install.sh --takeover --debug --tty ttyS0 --config /tmp/config.yaml --no-format /dev/vda1 https://github.com/Darkness4/k3os/releases/download/v0.31.2-k3s1r0
+/k3os.iso
 ```
 
 ### ARM Overlay Installation
 
-If you have a custom ARMv7 or ARM64 device you can easily use an existing bootable ARM image to create a k3OS setup.
-All you must do is boot the ARM system and then extract `k3os-rootfs-arm.tar.gz` to the root (stripping one path,
+#### RootFS installation
+
+If you have a custom ARM64 device you can easily use an existing bootable ARM64 image to create a k3OS setup.
+All you must do is boot the ARM system and then extract `k3os-rootfs-ar64m.tar.gz` to the root (stripping one path,
 look at the example below) and then place your cloud-config at `/k3os/system/config.yaml`. For example:
 
 ```bash
-curl -sfL https://github.com/rancher/k3os/releases/download/v0.10.0/k3os-rootfs-arm.tar.gz | tar zxvf - --strip-components=1 -C /
+curl -sfL https://github.com/Darkness4/k3os/releases/download/v0.31.2-k3s1r0/k3os-rootfs-arm64.tar.gz | tar zxvf - --strip-components=1 -C /
 cp myconfig.yaml /k3os/system/config.yaml
 sync
 reboot -f
@@ -197,6 +200,93 @@ but then when user space is to be initialized k3OS should take over.
 One important consideration at the moment is that k3OS assumes the root device is not read only.
 This typically means you need to remove `ro` from the kernel cmdline.
 This should be fixed in a future release.
+
+#### About Kernel Update on Raspberry PI
+
+1. Download an OS image from the official Raspberry Pi website.
+2. Extract the image, mount the image:
+
+   ```shell
+   # On your computer
+   parted image.img unit B print
+
+   mount -o loop,ro,offset=<value> image.img /mnt/test
+   ```
+
+3. Copy the /boot partition in a directory.
+4. Copy the /lib/modules in a directory.
+5. Transfer the modules to the Raspberry Pi via rsync. The `/lib/modules` directory is already writable.
+
+   ```shell
+   # On your computer
+   rsync -avP ./modules/ rancher@<raspi-ip>:/home/rancher/modules/
+   ```
+
+   ```shell
+   # Raspberry Pi
+   rsync -avP /home/rancher/modules/ /lib/modules/
+   chown root:root -R /lib/modules/
+   ```
+
+   The `/lib/modules` should contains a new directory with the kernel version.
+
+6. **Backup the /boot partition of the Raspberry Pi.**
+
+   ```shell
+   # On your computer
+   mkdir -p /mnt/boot
+   mount /dev/mmcblk0p1 /mnt/boot
+   ```
+
+   ```shell
+   # Desktop
+   rsync -avP rancher@<raspi-ip>:/mnt/boot/ ./boot-backup/
+   ```
+
+   > [!CAUTION]
+   >
+   > Lost the config.txt and cmdline.txt files?
+   >
+   > Here's the content of the files:
+   >
+   > **config.txt**
+   >
+   > ```toml
+   > dtoverlay=vc4-fkms-v3d
+   > gpu_mem=128
+   > arm_64bit=1
+   >
+   > [pi3]
+   > audio_pwm_mode=2
+   > [pi4]
+   > max_framebuffers=2
+   > kernel=kernel8.img
+   > [all]
+   > ```
+   >
+   > **cmdline.txt**
+   >
+   > ```shell
+   > dwc_otg.lpm_enable=0 root=PARTUUID=4fd3be14-02 rootfstype=ext4 elevator=deadline cgroup_memory=1 cgroup_enable=memory rootwait init=/sbin/init.preinit ro
+   > ```
+   >
+   > Find the PARTUUID with `blkid`. If you don't know, it's possible you can use `root=LABEL=root` or simply `root=/dev/mmcblk0p2`.
+
+7. Transfer the boot partition to the Raspberry Pi via rsync.
+
+   **YOU MAY NEED TO RESIZE THE PARTITION. USE GPARTED! TAKES AROUND 1 HOUR! AND YOU NEED TO DO IT ON PC! You can also delete unused kernel and initramfs.**
+
+   ```shell
+   # On your computer
+   rsync -avP ./boot/ rancher@<raspi-ip>:/home/rancher/boot/
+   ```
+
+   ```shell
+   # Don't delete anything, the cmdline.txt and config.txt are important.
+   rsync -avP /home/rancher/boot/ /mnt/boot/
+   chown root:root -R /mnt/boot/
+   ```
+
 
 ## Configuration
 
@@ -361,6 +451,10 @@ To enable a k3OS node to automatically upgrade from the [latest GitHub release](
 that will drain most pods, upgrade the k3OS content under `/k3os/system`, and then reboot. The system should come back up running the latest
 kernel and k3s version bundled with k3OS and ready to schedule pods.
 
+> [!NOTE]
+>
+> If an issue happens during the upgrade process, the label `plan.upgrade.cattle.io/k3os-latest` might reflect the wrong version. If this does happen, you can remove the label to re-run the upgrade process.
+
 #### Pre v0.9.0
 
 If your k3OS installation is running a version prior to the v0.9.0 release or one of its release candidates you can setup
@@ -399,7 +493,7 @@ To build k3OS you just need Docker and then run `make`. All artifacts will be pu
 If you are running on Linux you can run `./scripts/run` to run a VM of k3OS in the terminal. To exit
 the instance type `CTRL+a c` to get the qemu console and then `q` for quit.
 
-The source for the kernel is in `https://github.com/rancher/k3os-kernel` and similarly you
+The source for the kernel is in `https://github.com/Darkness4/k3os-kernel` and similarly you
 just need to have Docker and run `make` to compile the kernel.
 
 ## Configuration Reference
@@ -688,6 +782,22 @@ k3os:
 
 ## License
 
+```plaintext
+Copyright (c) 2020-2024 Marc Nguyen
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at
+
+[http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+```
+
+```plaintext
 Copyright (c) 2014-2020 [Rancher Labs, Inc.](http://rancher.com)
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -700,3 +810,4 @@ Unless required by applicable law or agreed to in writing, software distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
+```
