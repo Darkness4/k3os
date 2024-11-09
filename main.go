@@ -6,9 +6,9 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"syscall"
 
 	"github.com/docker/docker/pkg/reexec"
-	"github.com/moby/sys/mount"
 	"github.com/rancher/k3os/pkg/cli/app"
 	"github.com/rancher/k3os/pkg/enterchroot"
 	"github.com/rancher/k3os/pkg/transferroot"
@@ -39,7 +39,7 @@ func main() {
 func initrd() {
 	enterchroot.DebugCmdline = "k3os.debug"
 	transferroot.Relocate()
-	if err := mount.Mount("", "/", "none", "rw,remount"); err != nil {
+	if err := syscall.Mount("", "/", "", syscall.MS_REMOUNT, ""); err != nil {
 		logrus.Errorf("failed to remount root as rw: %v", err)
 	}
 	if err := enterchroot.Mount("./k3os/data", os.Args, os.Stdout, os.Stderr); err != nil {

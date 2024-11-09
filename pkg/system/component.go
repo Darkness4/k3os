@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"syscall"
 
-	"github.com/moby/sys/mount"
 	"github.com/otiai10/copy"
 	"github.com/sirupsen/logrus"
 )
@@ -59,7 +59,7 @@ func CopyComponent(src, dst string, remount bool, key string) (bool, error) {
 			"target": dst,
 			"flags":  "remount,rw",
 		}).Warn("remounting")
-		if err := mount.Mount("", dst, "none", "remount,rw"); err != nil {
+		if err := syscall.Mount("", dst, "none", syscall.MS_REMOUNT, ""); err != nil {
 			return false, err
 		}
 	}

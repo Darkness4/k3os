@@ -6,7 +6,6 @@ require (
 	github.com/docker/docker v27.3.1+incompatible
 	github.com/ghodss/yaml v1.0.0
 	github.com/mattn/go-isatty v0.0.20
-	github.com/moby/sys/mount v0.3.4
 	github.com/moby/sys/mountinfo v0.7.2
 	github.com/otiai10/copy v1.14.0
 	github.com/pkg/errors v0.9.1

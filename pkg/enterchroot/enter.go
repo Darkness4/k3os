@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/docker/docker/pkg/reexec"
-	"github.com/moby/sys/mount"
 	"github.com/moby/sys/mountinfo"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -217,7 +216,7 @@ func run(data string) error {
 		if err := os.MkdirAll(data, 0755); err != nil {
 			return errors.Wrapf(err, "mkdir %s", data)
 		}
-		if err := mount.Mount(data, data, "none", "rbind"); err != nil {
+		if err := syscall.Mount(data, data, "none", syscall.MS_BIND|syscall.MS_REC, ""); err != nil {
 			return errors.Wrapf(err, "remounting data %s", data)
 		}
 	}
@@ -238,13 +237,13 @@ func run(data string) error {
 
 	if device == "" {
 		logrus.Debugf("Bind mounting %s to %s", root, usr)
-		if err := mount.Mount(root, usr, "none", "bind"); err != nil {
+		if err := syscall.Mount(root, usr, "none", syscall.MS_BIND, ""); err != nil {
 			return fmt.Errorf("failed to bind mount")
 		}
 	} else {
 		logrus.Debugf("Mounting squashfs %s to %s", device, usr)
 		squashErr := checkSquashfs()
-		err = mount.Mount(device, usr, "squashfs", "ro")
+		err = syscall.Mount(device, usr, "squashfs", syscall.MS_RDONLY, "")
 		if err != nil {
 			err = errors.Wrap(err, "mounting squashfs")
 			if squashErr != nil {
@@ -271,7 +270,7 @@ func run(data string) error {
 		return errors.Wrap(err, "pivot_root failed")
 	}
 
-	if err := mount.Mount("", ".", "none", "rprivate"); err != nil {
+	if err := syscall.Mount("", ".", "", syscall.MS_PRIVATE|syscall.MS_REC, ""); err != nil {
 		return errors.Wrapf(err, "making . private %s", data)
 	}
 

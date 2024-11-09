@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"syscall"
 
-	"github.com/moby/sys/mount"
 	"github.com/moby/sys/mountinfo"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -21,7 +21,7 @@ func mountProc() error {
 		return err
 	}
 	logrus.Debug("mount /proc")
-	return mount.Mount("proc", "/proc", "proc", "")
+	return syscall.Mount("proc", "/proc", "proc", 0, "")
 }
 
 func mountDev() error {
@@ -33,7 +33,7 @@ func mountDev() error {
 		return err
 	}
 	logrus.Debug("mounting /dev")
-	return mount.Mount("none", "/dev", "devtmpfs", "")
+	return syscall.Mount("none", "/dev", "devtmpfs", 0, "")
 }
 
 func mknod(path string, mode uint32, major, minor int) error {
