@@ -1,5 +1,5 @@
 ### BASE ###
-FROM alpine:3.14 as base
+FROM alpine:3.20 as base
 ARG ARCH
 RUN apk --no-cache add \
     bash \
@@ -65,9 +65,9 @@ RUN apk --no-cache add \
     wpa_supplicant \
     xfsprogs \
     xz \
- && mv -vf /etc/conf.d/qemu-guest-agent /etc/conf.d/qemu-guest-agent.orig \
- && mv -vf /etc/conf.d/rngd             /etc/conf.d/rngd.orig \
- && mv -vf /etc/conf.d/udev-settle      /etc/conf.d/udev-settle.orig \
-# replicate the default "no idea, friend" behavior of virt-what
- && touch /usr/sbin/virt-what \
- && chmod +x /usr/sbin/virt-what
+    && mv -vf /etc/conf.d/qemu-guest-agent /etc/conf.d/qemu-guest-agent.orig \
+    && mv -vf /etc/conf.d/rngd             /etc/conf.d/rngd.orig \
+    && mv -vf /etc/conf.d/udev-settle      /etc/conf.d/udev-settle.orig \
+    # replicate the default "no idea, friend" behavior of virt-what
+    && touch /usr/sbin/virt-what \
+    && chmod +x /usr/sbin/virt-what
