@@ -1,6 +1,6 @@
 
-![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/rancher/k3os)
-![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/rancher/k3os?include_prereleases&label=release&sort=semver)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/Darkness4/k3os)
+![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/Darkness4/k3os?include_prereleases&label=release&sort=semver)
 
 # k3OS
 
@@ -116,7 +116,7 @@ Below is a reference of all cmdline args used to automate installation
 | k3os.install.force_efi  | false   | true                                              | Force EFI installation even when EFI is not detected |
 | k3os.install.device     |         | /dev/vda                                          | Device to partition and format (/dev/sda, /dev/vda) |
 | k3os.install.config_url |         | [https://gist.github.com/.../dweomer.yaml](https://gist.github.com/dweomer/8750d56fb21a3fbc8d888609d6e74296#file-dweomer-yaml) | The URL of the config to be installed at `/k3os/system/config.yaml` |
-| k3os.install.iso_url    |         | https://github.com/rancher/k3os/../k3os-amd64.iso | ISO to download and install from if booting from kernel/vmlinuz and not ISO. |
+| k3os.install.iso_url    |         | https://github.com/Darkness4/k3os/../k3os-amd64.iso | ISO to download and install from if booting from kernel/vmlinuz and not ISO. |
 | k3os.install.no_format  |         | true                                              | Do not partition and format, assume layout exists already |
 | k3os.install.tty        | auto    | ttyS0                                             | The tty device used for console |
 | k3os.install.debug      | false   | true                                              | Run installation with more logging and configure debug for installed system |
@@ -129,13 +129,13 @@ partitions and file system automatically, or you can create them manually if you
 
 ### Bootstrapped Installation
 
-You can install k3OS to a block device from any modern Linux distribution. Just download and run [install.sh](https://raw.githubusercontent.com/rancher/k3os/master/install.sh).
+You can install k3OS to a block device from any modern Linux distribution. Just download and run [install.sh](https://raw.githubusercontent.com/Darkness4/k3os/master/install.sh).
 This script will run the same installation as the ISO but is a bit more raw and will not prompt for configuration.
 
 ```
 Usage: ./install.sh [--force-efi] [--debug] [--tty TTY] [--poweroff] [--takeover] [--no-format] [--config https://.../config.yaml] DEVICE ISO_URL
 
-Example: ./install.sh /dev/vda https://github.com/rancher/k3os/releases/download/v0.10.0/k3os.iso
+Example: ./install.sh /dev/vda https://github.com/rancher/k3os/releases/download/v0.31.2-k3s1r0/k3os.iso
 
 DEVICE must be the disk that will be partitioned (/dev/vda). If you are using --no-format it should be the device of the K3OS_STATE partition (/dev/vda2)
 
@@ -169,7 +169,7 @@ on the path instead of `grub-mkrescue`.*
 
 ### Takeover Installation
 
-A special mode of installation is designed to install to a current running Linux system. This only works on ARM64 and x86_64. Download [install.sh](https://raw.githubusercontent.com/rancher/k3os/master/install.sh)
+A special mode of installation is designed to install to a current running Linux system. This only works on ARM64 and x86_64. Download [install.sh](https://raw.githubusercontent.com/Darkness4/k3os/master/install.sh)
 and run with the `--takeover` flag. This will install k3OS to the current root and override the grub.cfg. After you reboot the system k3OS will then delete all files on the root partition that are not k3OS and then shutdown. This mode is particularly handy when creating cloud images. This way you can use an existing base image like Ubuntu and install k3OS over the top, snapshot, and create a new image.
 
 In order for this to work a couple of assumptions are made. First the root (/) is assumed to be an ext4 partition. Also it is assumed that grub2 is installed and looking for the configuration at `/boot/grub/grub.cfg`. When running `--takeover` ensure that you also set `--no-format` and DEVICE must be set to the partition of `/`. Refer to the AWS packer template to see this mode in action. Below is any example of how to run a takeover installation.
@@ -446,7 +446,7 @@ the cluster.
 ### Automatic Upgrades
 
 Integration with [rancher/system-upgrade-controller](https://github.com/rancher/system-upgrade-controller) has been implemented as of [v0.9.0](https://github.com/rancher/k3os/releases/tag/v0.9.0).
-To enable a k3OS node to automatically upgrade from the [latest GitHub release](https://github.com/rancher/k3os/releases/latest) you will need to make sure it has the label
+To enable a k3OS node to automatically upgrade from the [latest GitHub release](https://github.com/Darkness4/k3os/releases/latest) you will need to make sure it has the label
 `k3os.io/upgrade` with value `latest` (for k3OS versions prior to v0.11.x please use label `plan.upgrade.cattle.io/k3os-latest`). The upgrade controller will then spawn an upgrade job
 that will drain most pods, upgrade the k3OS content under `/k3os/system`, and then reboot. The system should come back up running the latest
 kernel and k3s version bundled with k3OS and ready to schedule pods.
@@ -462,9 +462,9 @@ the system upgrade controller to upgrade your k3OS by following these steps:
 
 ```shell script
 # apply the system-upgrade-controller manifest (once per cluster)
-kubectl apply -f https://raw.githubusercontent.com/rancher/k3os/v0.10.0/overlay/share/rancher/k3s/server/manifests/system-upgrade-controller.yaml
+kubectl apply -f https://raw.githubusercontent.com/Darkness4/k3os/v0.31.2-k3s1r0/overlay/share/rancher/k3s/server/manifests/system-upgrade-controller.yaml
 # after the system-upgrade-controller pod is Ready, apply the plan manifest (once per cluster)
-kubectl apply -f https://raw.githubusercontent.com/rancher/k3os/v0.10.0/overlay/share/rancher/k3s/server/manifests/system-upgrade-plans/k3os-latest.yaml
+kubectl apply -f https://raw.githubusercontent.com/Darkness4/k3os/v0.31.2-k3s1r0/overlay/share/rancher/k3s/server/manifests/system-upgrade-plans/k3os-latest.yaml
 # apply the `plan.upgrade.cattle.io/k3os-latest` label as described above (for every k3OS node), e.g.
 kubectl label nodes -l k3os.io/mode plan.upgrade.cattle.io/k3os-latest=enabled # this should work on any cluster with k3OS installations at v0.7.0 or greater
 ```
@@ -476,7 +476,7 @@ For single-node or development use cases, where the operator is not being used, 
 When using an overlay install such as on Raspberry Pi (see [ARM Overlay Installation](#arm-overlay-installation)) the original distro kernel (such as Raspbian) will continue to be used. On these systems the k3os-upgrade-kernel script will exit with a warning and perform no action.
 
 ```bash
-export K3OS_VERSION=v0.10.0
+export K3OS_VERSION=v0.31.2-k3s1r0
 /usr/share/rancher/k3os/scripts/k3os-upgrade-rootfs
 /usr/share/rancher/k3os/scripts/k3os-upgrade-kernel
 ```
