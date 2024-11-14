@@ -6,7 +6,8 @@ RUN apk --no-cache add \
     bash-completion \
     blkid \
     busybox-openrc \
-    dev-openrc \
+    busybox-mdev-openrc \
+    busybox-extras-openrc \
     ca-certificates \
     connman \
     conntrack-tools \
